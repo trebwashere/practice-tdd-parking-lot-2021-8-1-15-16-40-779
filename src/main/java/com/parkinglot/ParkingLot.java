@@ -1,11 +1,18 @@
 package com.parkinglot;
 
 public class ParkingLot {
+    private Car car;
+    private ParkingTicket parkingTicket;
     public ParkingTicket parkCar(Car car) {
-        return new ParkingTicket();
+        this.car = car;
+        this.parkingTicket = new ParkingTicket();
+        return parkingTicket;
     }
 
     public Car fetch(ParkingTicket parkingTicket) {
-        return new Car();
+        if(parkingTicket.equals(this.parkingTicket)) {
+            return car;
+        }
+        return null;
     }
 }
