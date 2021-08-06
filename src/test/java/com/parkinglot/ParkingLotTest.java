@@ -6,11 +6,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ParkingLotTest {
 
     private ParkingLot parkingLot;
+    private ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
     @Mock
     private ParkingLot mockParkingLot;
@@ -19,7 +23,13 @@ public class ParkingLotTest {
     public void setup() {
         parkingLot = new ParkingLot();
         MockitoAnnotations.openMocks(this);
+        System.setOut(new PrintStream(outContent));
     }
+
+    private String systemOut() {
+        return outContent.toString();
+    }
+
     @Test
     public void should_return_parking_ticket_given_a_parking_lot_and_a_car() {
         Car car = new Car();
@@ -88,5 +98,11 @@ public class ParkingLotTest {
 
         assertNull(bertWithDavidTicket);
         assertNull(davidWithBertTicket);
+    }
+
+    @Test
+    public void should_display_Unrecognized_parking_ticket_when_car_is_fetched_but_no_car_was_released() {
+        should_not_fetch_car_given_a_parking_lot_with_parked_car_but_invalid_ticket();
+        assertTrue(systemOut().contains("Unrecognized parking ticket."));
     }
 }
