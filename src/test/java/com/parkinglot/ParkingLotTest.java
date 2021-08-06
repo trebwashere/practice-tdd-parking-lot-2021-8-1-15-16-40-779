@@ -45,4 +45,14 @@ public class ParkingLotTest {
 
         assertNull(parkingTicket);
     }
+
+    @Test
+    public void should_not_fetch_car_given_a_parking_lot_with_parked_car_but_invalid_ticket() {
+        Car car = new Car();
+        parkingLot.parkCar(car);
+        ParkingTicket fakeParkingTicket = new ParkingTicket();
+        Car outputCar = parkingLot.fetch(fakeParkingTicket);
+
+        assertNull(outputCar);
+    }
 }
