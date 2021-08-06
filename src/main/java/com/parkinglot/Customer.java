@@ -8,4 +8,8 @@ public class Customer {
     public void addParkingTicket(ParkingTicket parkingTicket) {
         parkingTicketList.add(parkingTicket);
     }
+
+    public List<ParkingTicket> getParkingTicketList() {
+        return parkingTicketList;
+    }
 }

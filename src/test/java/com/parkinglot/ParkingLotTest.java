@@ -33,6 +33,7 @@ public class ParkingLotTest {
         Customer customer = new Customer();
         Car car = new Car();
         ParkingTicket parkingTicket = parkingLot.parkCar(car);
+        customer.addParkingTicket(parkingTicket);
         Car returnedCar = parkingLot.fetch(customer,parkingTicket);
 
         assertEquals(returnedCar, car);
@@ -63,6 +64,7 @@ public class ParkingLotTest {
         Customer customer = new Customer();
         Car car = new Car();
         ParkingTicket parkingTicket = parkingLot.parkCar(car);
+        customer.addParkingTicket(parkingTicket);
         parkingLot.fetch(customer,parkingTicket);
         Car reusedTicketForCar = parkingLot.fetch(customer,parkingTicket);
         assertNull(reusedTicketForCar);
