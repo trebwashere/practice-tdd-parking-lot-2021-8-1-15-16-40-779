@@ -13,10 +13,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ParkingLotTest {
 
     private ParkingLot parkingLot;
+    private StandardParkingBoy standardParkingBoy;
 
     @BeforeEach
     public void setup() {
         parkingLot = new ParkingLot();
+        standardParkingBoy = new StandardParkingBoy(parkingLot);
     }
 
     private void throwNoAvailableParkingPositionException() { throw new NoAvailableParkingPositionException(); }
@@ -77,5 +79,13 @@ public class ParkingLotTest {
     public void should_display_No_Position_Available_given_parkCar_is_called_but_parking_lot_is_already_full() {
         Exception exception = assertThrows(NoAvailableParkingPositionException.class, this::throwNoAvailableParkingPositionException);
         assertEquals("No available position.", exception.getMessage());
+    }
+
+    @Test
+    public void parkingBoy_should_return_parking_ticket_given_a_parking_lot_and_a_car() {
+        Car car = new Car();
+
+        ParkingTicket parkingTicket = standardParkingBoy.park(car);
+        assertNotNull(parkingTicket);
     }
 }
