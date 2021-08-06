@@ -31,7 +31,11 @@ public class ParkingLot {
     }
 
     public Car fetch(ParkingTicket parkingTicket) {
-        return ticketAndCarMap.get(parkingTicket);
+        Car fetchedCar = ticketAndCarMap.get(parkingTicket);
+        if (fetchedCar != null) {
+            ticketAndCarMap.remove(parkingTicket);
+        }
+        return fetchedCar;
     }
 
     public int getParkingLotSlotSize() {
