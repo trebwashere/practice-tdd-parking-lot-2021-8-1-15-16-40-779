@@ -2,15 +2,17 @@ package com.parkinglot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class ParkingLotTest {
 
     private ParkingLot parkingLot;
@@ -22,7 +24,6 @@ public class ParkingLotTest {
     @BeforeEach
     public void setup() {
         parkingLot = new ParkingLot();
-        MockitoAnnotations.openMocks(this);
         System.setOut(new PrintStream(outContent));
     }
 
@@ -52,7 +53,7 @@ public class ParkingLotTest {
     @Test
     public void should_not_allow_car_to_park_if_parking_lot_is_full() {
         Car car = new Car();
-        Mockito.when(mockParkingLot.getParkingLotSlotSize()).thenReturn(10);
+        Mockito.lenient().when(mockParkingLot.getParkingLotSlotSize()).thenReturn(10);
         ParkingTicket parkingTicket = mockParkingLot.parkCar(car);
 
         assertNull(parkingTicket);
@@ -104,5 +105,14 @@ public class ParkingLotTest {
     public void should_display_Unrecognized_parking_ticket_when_car_is_fetched_but_no_car_was_released() {
         should_not_fetch_car_given_a_parking_lot_with_parked_car_but_invalid_ticket();
         assertTrue(systemOut().contains("Unrecognized parking ticket."));
+    }
+
+    @Test
+    public void should_display_No_Position_Available_given_parkCar_is_called_but_parking_lot_is_already_full() {
+        Car car = new Car();
+        ParkingLot spyParkingLot = Mockito.spy(ParkingLot.class);
+        Mockito.lenient().when(spyParkingLot.getParkingLotSlotSize()).thenReturn(10);
+        spyParkingLot.parkCar(car);
+        assertTrue(systemOut().contains("No available position."));
     }
 }
