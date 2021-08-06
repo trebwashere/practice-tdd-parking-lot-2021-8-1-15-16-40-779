@@ -2,11 +2,17 @@ package com.parkinglot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ParkingLotTest {
 
     private ParkingLot parkingLot;
+
+    @Mock
+    private ParkingLot mockParkingLot;
 
     @BeforeEach
     public void setup() {
@@ -27,5 +33,14 @@ public class ParkingLotTest {
         Car returnedCar = parkingLot.fetch(parkingTicket);
 
         assertEquals(returnedCar, car);
+    }
+
+    @Test
+    public void should_not_allow_car_to_park_if_parking_lot_is_full() {
+        Car car = new Car();
+        Mockito.when(mockParkingLot.getParkingLotSlotSize()).thenReturn(10);
+        ParkingTicket parkingTicket = parkingLot.parkCar(car);
+
+        assertNull(parkingTicket);
     }
 }

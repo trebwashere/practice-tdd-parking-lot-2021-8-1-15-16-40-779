@@ -30,4 +30,8 @@ public class ParkingLot {
     public Car fetch(ParkingTicket parkingTicket) {
         return ticketAndCarMap.get(parkingTicket);
     }
+
+    public int getParkingLotSlotSize() {
+        return ticketAndCarMap.size();
+    }
 }
