@@ -30,7 +30,7 @@ public class ParkingLot {
         return null;
     }
 
-    public Car fetch(ParkingTicket parkingTicket) {
+    public Car fetch(Customer customer,ParkingTicket parkingTicket) {
         Car fetchedCar = ticketAndCarMap.get(parkingTicket);
         if (fetchedCar != null) {
             ticketAndCarMap.remove(parkingTicket);
