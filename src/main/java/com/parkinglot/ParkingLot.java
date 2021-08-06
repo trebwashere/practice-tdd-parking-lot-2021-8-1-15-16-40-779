@@ -4,27 +4,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ParkingLot {
+    private int parkingLotSize = 10;
     private final Map<ParkingTicket, Car> ticketAndCarMap = new HashMap<>();
 
+    public ParkingLot(int parkingLotSize) {
+        this.parkingLotSize = parkingLotSize;
+    }
+
+    public ParkingLot() {
+    }
+
     public ParkingTicket parkCar(Car car) {
-        if (this.getParkingLotSlotSize() < 10) {
+        if (this.getParkingLotSlotSize() < parkingLotSize) {
             ParkingTicket parkingTicket = new ParkingTicket();
             ticketAndCarMap.put(parkingTicket, car);
             return parkingTicket;
         }
-        System.out.println("No available position.");
-        return null;
+        throw new NoAvailableParkingPositionException();
     }
 
-    public Car fetch(Customer customer,ParkingTicket parkingTicket) {
-        if(customer.getParkingTicketList().contains(parkingTicket)) {
-            Car fetchedCar = ticketAndCarMap.get(parkingTicket);
-            customer.getParkingTicketList().remove(parkingTicket);
-            ticketAndCarMap.remove(parkingTicket);
-            return fetchedCar;
+    public Car fetch(ParkingTicket parkingTicket) {
+        Car fetchedCar = ticketAndCarMap.get(parkingTicket);
+        if (fetchedCar == null) {
+            throw new UnrecognizedParkingTicketException();
         }
-        System.out.println("Unrecognized parking ticket.");
-        return null;
+        ticketAndCarMap.remove(parkingTicket);
+        return fetchedCar;
     }
 
     public int getParkingLotSlotSize() {
