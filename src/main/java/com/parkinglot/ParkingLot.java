@@ -12,6 +12,7 @@ public class ParkingLot {
             ticketAndCarMap.put(parkingTicket, car);
             return parkingTicket;
         }
+        System.out.println("No available position.");
         return null;
     }
 
