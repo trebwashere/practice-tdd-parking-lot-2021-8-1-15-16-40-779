@@ -22,9 +22,12 @@ public class ParkingLot {
     }
 
     public ParkingTicket parkCar(Car car) {
-        ParkingTicket parkingTicket = new ParkingTicket();
-        ticketAndCarMap.put(parkingTicket, car);
-        return parkingTicket;
+        if (parkingLot.getParkingLotSlotSize() < 10) {
+            ParkingTicket parkingTicket = new ParkingTicket();
+            ticketAndCarMap.put(parkingTicket, car);
+            return parkingTicket;
+        }
+        return null;
     }
 
     public Car fetch(ParkingTicket parkingTicket) {
