@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +18,7 @@ public class ParkingLotTest {
     @BeforeEach
     public void setup() {
         parkingLot = ParkingLot.getInstance();
+        MockitoAnnotations.openMocks(this);
     }
     @Test
     public void should_return_parking_ticket_given_a_parking_lot_and_a_car() {
@@ -39,7 +41,7 @@ public class ParkingLotTest {
     public void should_not_allow_car_to_park_if_parking_lot_is_full() {
         Car car = new Car();
         Mockito.when(mockParkingLot.getParkingLotSlotSize()).thenReturn(10);
-        ParkingTicket parkingTicket = parkingLot.parkCar(car);
+        ParkingTicket parkingTicket = mockParkingLot.parkCar(car);
 
         assertNull(parkingTicket);
     }
