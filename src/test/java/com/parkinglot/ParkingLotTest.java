@@ -55,4 +55,13 @@ public class ParkingLotTest {
 
         assertNull(outputCar);
     }
+
+    @Test
+    public void should_not_be_able_to_fetch_car_given_a_parking_lot_with_parked_car_but_reused_ticket() {
+        Car car = new Car();
+        ParkingTicket parkingTicket = parkingLot.parkCar(car);
+        parkingLot.fetch(parkingTicket);
+        Car reusedTicketForCar = parkingLot.fetch(parkingTicket);
+        assertNull(reusedTicketForCar);
+    }
 }
