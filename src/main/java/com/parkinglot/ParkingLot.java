@@ -22,6 +22,7 @@ public class ParkingLot {
             ticketAndCarMap.remove(parkingTicket);
             return fetchedCar;
         }
+        System.out.println("Unrecognized parking ticket.");
         return null;
     }
 
