@@ -1,9 +1,13 @@
 package com.parkinglot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ParkingLot {
     private Car car;
-    private ParkingTicket parkingTicket;
     private static ParkingLot parkingLot;
+
+    private Map<ParkingTicket, Car> ticketAndCarMap = new HashMap<>();
 
     private ParkingLot()
     {
@@ -18,15 +22,12 @@ public class ParkingLot {
     }
 
     public ParkingTicket parkCar(Car car) {
-        this.car = car;
-        this.parkingTicket = new ParkingTicket();
+        ParkingTicket parkingTicket = new ParkingTicket();
+        ticketAndCarMap.put(parkingTicket, car);
         return parkingTicket;
     }
 
     public Car fetch(ParkingTicket parkingTicket) {
-        if(parkingTicket.equals(this.parkingTicket)) {
-            return car;
-        }
-        return null;
+        return ticketAndCarMap.get(parkingTicket);
     }
 }
