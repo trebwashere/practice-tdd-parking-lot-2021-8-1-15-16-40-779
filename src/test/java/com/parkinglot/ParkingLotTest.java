@@ -17,7 +17,7 @@ public class ParkingLotTest {
 
     @BeforeEach
     public void setup() {
-        parkingLot = ParkingLot.getInstance();
+        parkingLot = new ParkingLot();
         MockitoAnnotations.openMocks(this);
     }
     @Test

@@ -4,25 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ParkingLot {
-    private Car car;
-    private static ParkingLot parkingLot;
-
-    private Map<ParkingTicket, Car> ticketAndCarMap = new HashMap<>();
-
-    private ParkingLot()
-    {
-
-    }
-
-    public static ParkingLot getInstance() {
-        if (parkingLot == null) {
-            parkingLot = new ParkingLot();
-        }
-        return parkingLot;
-    }
+    private final Map<ParkingTicket, Car> ticketAndCarMap = new HashMap<>();
 
     public ParkingTicket parkCar(Car car) {
-        if (parkingLot.getParkingLotSlotSize() < 10) {
+        if (this.getParkingLotSlotSize() < 10) {
             ParkingTicket parkingTicket = new ParkingTicket();
             ticketAndCarMap.put(parkingTicket, car);
             return parkingTicket;
@@ -31,11 +16,13 @@ public class ParkingLot {
     }
 
     public Car fetch(Customer customer,ParkingTicket parkingTicket) {
-        Car fetchedCar = ticketAndCarMap.get(parkingTicket);
-        if (fetchedCar != null) {
+        if(customer.getParkingTicketList().contains(parkingTicket)) {
+            Car fetchedCar = ticketAndCarMap.get(parkingTicket);
+            customer.getParkingTicketList().remove(parkingTicket);
             ticketAndCarMap.remove(parkingTicket);
+            return fetchedCar;
         }
-        return fetchedCar;
+        return null;
     }
 
     public int getParkingLotSlotSize() {
