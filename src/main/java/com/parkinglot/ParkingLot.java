@@ -47,4 +47,8 @@ public class ParkingLot {
     public int getParkingLotSize() {
         return parkingLotSize;
     }
+
+    public Map<ParkingTicket, Car> getTicketAndCarMap() {
+        return ticketAndCarMap;
+    }
 }

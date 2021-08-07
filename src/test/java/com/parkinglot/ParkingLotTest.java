@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,21 +17,21 @@ public class ParkingLotTest {
     private Car car;
     private ParkingLot parkingLot;
     private StandardParkingBoy standardParkingBoy;
-    private List<ParkingLot> parkingLotList;
     private StandardParkingBoy standardParkingBoyWithParkingLotList;
     private SmartParkingBoy smartParkingBoyWithParkingLotList;
     private SuperSmartParkingBoy superSmartParkingBoyWithParkingLotList;
+    private ParkingLotManager parkingLotManagerWithParkingLotList;
 
 
     @BeforeEach
     public void setup() {
         car = new Car();
         parkingLot = new ParkingLot();
-        standardParkingBoy = new StandardParkingBoy(parkingLot);
-        parkingLotList = Arrays.asList(parkingLot, parkingLot, parkingLot);
-        standardParkingBoyWithParkingLotList = new StandardParkingBoy(parkingLotList);
-        smartParkingBoyWithParkingLotList = new SmartParkingBoy(parkingLotList);
-        superSmartParkingBoyWithParkingLotList = new SuperSmartParkingBoy(parkingLotList);
+        standardParkingBoy = new StandardParkingBoy(new ParkingLot());
+        standardParkingBoyWithParkingLotList = new StandardParkingBoy(Arrays.asList(new ParkingLot(), new ParkingLot(), new ParkingLot()));
+        smartParkingBoyWithParkingLotList = new SmartParkingBoy(Arrays.asList(new ParkingLot(), new ParkingLot(), new ParkingLot()));
+        superSmartParkingBoyWithParkingLotList = new SuperSmartParkingBoy(Arrays.asList(new ParkingLot(), new ParkingLot(), new ParkingLot()));
+        parkingLotManagerWithParkingLotList = new ParkingLotManager(Arrays.asList(new ParkingLot(), new ParkingLot(), new ParkingLot()));
     }
 
     private void throwNoAvailableParkingPositionException() { throw new NoAvailableParkingPositionException(); }
@@ -299,4 +298,94 @@ public class ParkingLotTest {
         assertEquals(mockSuperSmartParkingBoy.getParkingLots().get(1).fetch(parkingTicket), car);
     }
 
+    @Test
+    public void parkingLotManager_should_return_car_when_fetch_given_a_list_of_parking_lots_with_parked_car_and_a_parking_ticket() {
+        ParkingTicket parkingTicket = parkingLotManagerWithParkingLotList.park(car);
+        assertNotNull(parkingTicket);
+    }
+
+    @Test
+    public void parkingLotManager_should_not_fetch_car_given_a_list_of_parking_lots_with_parked_car_but_invalid_ticket() {
+        ParkingTicket parkingTicket = parkingLotManagerWithParkingLotList.park(car);
+        Car returnedCar = parkingLotManagerWithParkingLotList.fetch(parkingTicket);
+
+        assertEquals(returnedCar, car);
+    }
+
+    @Test
+    public void parkingLotManager_should_not_fetch_car_given_a_parking_lot_with_parked_car_but_invalid_ticket() {
+        parkingLotManagerWithParkingLotList.park(car);
+        ParkingTicket fakeParkingTicket = new ParkingTicket();
+        Exception exception = assertThrows(UnrecognizedParkingTicketException.class, () -> parkingLotManagerWithParkingLotList.fetch(fakeParkingTicket));
+
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+
+    @Test
+    public void parkingLotManager_should_not_be_able_to_fetch_car_given_a_list_of_parking_lots_with_parked_car_but_reused_ticket() {
+        ParkingTicket parkingTicket = parkingLotManagerWithParkingLotList.park(car);
+        parkingLotManagerWithParkingLotList.fetch(parkingTicket);
+        Exception exception = assertThrows(UnrecognizedParkingTicketException.class, () -> parkingLotManagerWithParkingLotList.fetch(parkingTicket));
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+
+    @Test
+    public void parkingLotManager_should_not_allow_car_to_park_if_a_list_of_parking_lots_is_full() {
+        ParkingLot spyParkingLot = Mockito.spy(ParkingLot.class);
+        ParkingLotManager parkingBoyToBeSpied = new ParkingLotManager(Arrays.asList(spyParkingLot, spyParkingLot, spyParkingLot));
+        ParkingLotManager mockParkingLotManager = Mockito.spy(parkingBoyToBeSpied);
+        Mockito.lenient().when(spyParkingLot.isFull()).thenReturn(true);
+        Exception exception = assertThrows(NoAvailableParkingPositionException.class, () -> mockParkingLotManager.park(car));
+        assertEquals("No available position.", exception.getMessage());
+    }
+
+    @Test
+    public void parkingLotManager_should_park_car_at_next_available_parking_lot_if_first_parking_lot_is_full() {
+        ParkingLot spyParkingLot = Mockito.spy(ParkingLot.class);
+        ParkingLotManager parkingBoyToBeSpied = new ParkingLotManager(Arrays.asList(spyParkingLot, parkingLot));
+        ParkingLotManager mockParkingLotManager = Mockito.spy(parkingBoyToBeSpied);
+        Mockito.lenient().when(spyParkingLot.isFull()).thenReturn(true);
+        ParkingTicket parkingTicket = mockParkingLotManager.park(car);
+        assertNotNull(parkingTicket);
+        assertEquals(mockParkingLotManager.getParkingLots().get(1).fetch(parkingTicket), car);
+    }
+
+    @Test
+    public void parkingLotManager_should_be_able_to_instruct_parking_boy_in_management_list_to_park_car() {
+        Car standardCar = new Car();
+        Car smartCar = new Car();
+        Car superSmartCar = new Car();
+
+        parkingLotManagerWithParkingLotList.setParkingBoyList(
+                Arrays.asList(standardParkingBoyWithParkingLotList,smartParkingBoyWithParkingLotList,superSmartParkingBoyWithParkingLotList));
+
+        ParkingTicket standardTicket = parkingLotManagerWithParkingLotList.instructParkingBoyToParkCar(standardParkingBoyWithParkingLotList,standardCar);
+        ParkingTicket smartCarTicket = parkingLotManagerWithParkingLotList.instructParkingBoyToParkCar(smartParkingBoyWithParkingLotList,smartCar);
+        ParkingTicket superSmartTicket = parkingLotManagerWithParkingLotList.instructParkingBoyToParkCar(superSmartParkingBoyWithParkingLotList,superSmartCar);
+
+        assertTrue(standardParkingBoyWithParkingLotList.getParkingLots().get(0).isTicketAtCurrentParkingLot(standardTicket));
+        assertTrue(smartParkingBoyWithParkingLotList.getParkingLots().get(0).isTicketAtCurrentParkingLot(smartCarTicket));
+        assertTrue(superSmartParkingBoyWithParkingLotList.getParkingLots().get(0).isTicketAtCurrentParkingLot(superSmartTicket));
+
+        assertEquals(3,parkingLotManagerWithParkingLotList.getParkingLots()
+        .stream().filter(parkingLotOfManager -> parkingLotOfManager.getTicketAndCarMap().isEmpty()).count());
+    }
+
+    @Test
+    public void parkingLotManager_should_be_able_to_instruct_parking_boy_in_management_list_to_fetch_car() {
+        Car standardCar = new Car();
+        Car smartCar = new Car();
+        Car superSmartCar = new Car();
+
+        parkingLotManagerWithParkingLotList.setParkingBoyList(
+                Arrays.asList(standardParkingBoyWithParkingLotList,smartParkingBoyWithParkingLotList,superSmartParkingBoyWithParkingLotList));
+
+        ParkingTicket standardTicket = parkingLotManagerWithParkingLotList.instructParkingBoyToParkCar(standardParkingBoyWithParkingLotList,standardCar);
+        ParkingTicket smartCarTicket = parkingLotManagerWithParkingLotList.instructParkingBoyToParkCar(smartParkingBoyWithParkingLotList,smartCar);
+        ParkingTicket superSmartTicket = parkingLotManagerWithParkingLotList.instructParkingBoyToParkCar(superSmartParkingBoyWithParkingLotList,superSmartCar);
+
+        assertEquals(standardCar,parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(standardParkingBoyWithParkingLotList,standardTicket));
+        assertEquals(smartCar,parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(smartParkingBoyWithParkingLotList,smartCarTicket));
+        assertEquals(superSmartCar,parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(superSmartParkingBoyWithParkingLotList,superSmartTicket));
+    }
 }
