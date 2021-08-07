@@ -20,7 +20,10 @@ public abstract class ParkingBoy {
 
     abstract ParkingTicket park(Car car);
 
-    abstract Car fetch (ParkingTicket parkingTicket);
+    public Car fetch(ParkingTicket parkingTicket) {
+        return findParkingLotRelatedToTicket(parkingTicket)
+                .fetch(parkingTicket);
+    }
 
     protected ParkingLot findParkingLotRelatedToTicket(ParkingTicket parkingTicket) {
         return getParkingLots().stream()

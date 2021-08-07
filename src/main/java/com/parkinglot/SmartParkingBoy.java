@@ -19,11 +19,6 @@ public class SmartParkingBoy extends ParkingBoy{
                 .parkCar(car);
     }
 
-    public Car fetch(ParkingTicket parkingTicket) {
-        return findParkingLotRelatedToTicket(parkingTicket)
-                .fetch(parkingTicket);
-    }
-
     private Optional<ParkingLot> findParkingLotWithMostSlots() {
         return getParkingLots().stream()
                 .filter(parkingLot -> !parkingLot.isFull())

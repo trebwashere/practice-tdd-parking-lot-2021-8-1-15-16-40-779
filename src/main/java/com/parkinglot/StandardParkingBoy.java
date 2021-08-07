@@ -17,11 +17,6 @@ public class StandardParkingBoy extends ParkingBoy{
                 .parkCar(car);
     }
 
-    public Car fetch(ParkingTicket parkingTicket) {
-        return findParkingLotRelatedToTicket(parkingTicket)
-                .fetch(parkingTicket);
-    }
-
     private ParkingLot findFirstAvailableParkingLot() {
         return getParkingLots().stream()
                 .filter(parkingLot -> !parkingLot.isFull())
