@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -387,5 +388,41 @@ public class ParkingLotTest {
         assertEquals(standardCar,parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(standardParkingBoyWithParkingLotList,standardTicket));
         assertEquals(smartCar,parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(smartParkingBoyWithParkingLotList,smartCarTicket));
         assertEquals(superSmartCar,parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(superSmartParkingBoyWithParkingLotList,superSmartTicket));
+    }
+
+    @Test
+    public void parkingLotManager_should_catch_error_of_parking_boy_given_invalid_ticket() {
+        parkingLotManagerWithParkingLotList.setParkingBoyList(
+                Collections.singletonList(standardParkingBoyWithParkingLotList));
+        ParkingTicket fakeParkingTicket = new ParkingTicket();
+        Exception exception = assertThrows(UnrecognizedParkingTicketException.class,
+                () -> parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(standardParkingBoyWithParkingLotList,fakeParkingTicket));
+
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+
+    @Test
+    public void parkingLotManager_should_catch_error_of_parking_boy_given_reused_ticket() {
+        parkingLotManagerWithParkingLotList.setParkingBoyList(
+                Collections.singletonList(standardParkingBoyWithParkingLotList));
+        ParkingTicket parkingTicket = parkingLotManagerWithParkingLotList.instructParkingBoyToParkCar(standardParkingBoyWithParkingLotList,car);
+        Car outputCar = parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(standardParkingBoyWithParkingLotList,parkingTicket);
+        assertEquals(car, outputCar);
+        Exception exception = assertThrows(UnrecognizedParkingTicketException.class,
+                () -> parkingLotManagerWithParkingLotList.instructParkingBoyToFetchCar(standardParkingBoyWithParkingLotList,parkingTicket));
+
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+
+    @Test
+    public void parkingLotManager_should_catch_error_if_a_list_of_parking_lots_is_full() {
+        ParkingLot spyParkingLot = Mockito.spy(ParkingLot.class);
+        StandardParkingBoy parkingBoyToBeSpied = new StandardParkingBoy(Arrays.asList(spyParkingLot, spyParkingLot, spyParkingLot));
+        StandardParkingBoy mockParkingBoy = Mockito.spy(parkingBoyToBeSpied);
+        parkingLotManagerWithParkingLotList.setParkingBoyList(Collections.singletonList(mockParkingBoy));
+        Mockito.lenient().when(spyParkingLot.isFull()).thenReturn(true);
+        Exception exception = assertThrows(NoAvailableParkingPositionException.class, () ->
+                parkingLotManagerWithParkingLotList.instructParkingBoyToParkCar(mockParkingBoy,car));
+        assertEquals("No available position.", exception.getMessage());
     }
 }
