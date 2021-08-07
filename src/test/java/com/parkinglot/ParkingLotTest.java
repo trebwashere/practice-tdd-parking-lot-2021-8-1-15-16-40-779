@@ -18,10 +18,10 @@ public class ParkingLotTest {
     private Car car;
     private ParkingLot parkingLot;
     private StandardParkingBoy standardParkingBoy;
-    private SmartParkingBoy smartParkingBoy;
     private List<ParkingLot> parkingLotList;
     private StandardParkingBoy standardParkingBoyWithParkingLotList;
     private SmartParkingBoy smartParkingBoyWithParkingLotList;
+    private SuperSmartParkingBoy superSmartParkingBoyWithParkingLotList;
 
 
     @BeforeEach
@@ -29,10 +29,10 @@ public class ParkingLotTest {
         car = new Car();
         parkingLot = new ParkingLot();
         standardParkingBoy = new StandardParkingBoy(parkingLot);
-        smartParkingBoy = new SmartParkingBoy(parkingLot);
         parkingLotList = Arrays.asList(parkingLot, parkingLot, parkingLot);
         standardParkingBoyWithParkingLotList = new StandardParkingBoy(parkingLotList);
         smartParkingBoyWithParkingLotList = new SmartParkingBoy(parkingLotList);
+        superSmartParkingBoyWithParkingLotList = new SuperSmartParkingBoy(parkingLotList);
     }
 
     private void throwNoAvailableParkingPositionException() { throw new NoAvailableParkingPositionException(); }
@@ -237,6 +237,66 @@ public class ParkingLotTest {
         ParkingTicket parkingTicket = mockSmartParkingBoy.park(car);
         assertNotNull(parkingTicket);
         assertEquals(mockSmartParkingBoy.getParkingLots().get(1).fetch(parkingTicket), car);
+    }
+
+    @Test
+    public void superSmartParkingBoy_should_return_parking_ticket_given_a_list_of_parking_lots_and_a_car() {
+        ParkingTicket parkingTicket = superSmartParkingBoyWithParkingLotList.park(car);
+        assertNotNull(parkingTicket);
+    }
+
+    @Test
+    public void superSmartParkingBoy_should_return_car_when_fetch_given_a_list_of_parking_lots_with_parked_car_and_a_parking_ticket() {
+        ParkingTicket parkingTicket = superSmartParkingBoyWithParkingLotList.park(car);
+        Car returnedCar = superSmartParkingBoyWithParkingLotList.fetch(parkingTicket);
+
+        assertEquals(returnedCar, car);
+    }
+
+    @Test
+    public void superSmartParkingBoy_should_not_fetch_car_given_a_list_of_parking_lots_with_parked_car_but_invalid_ticket() {
+        superSmartParkingBoyWithParkingLotList.park(car);
+        ParkingTicket fakeParkingTicket = new ParkingTicket();
+        Exception exception = assertThrows(UnrecognizedParkingTicketException.class, () -> superSmartParkingBoyWithParkingLotList.fetch(fakeParkingTicket));
+
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+
+    @Test
+    public void superSmartParkingBoy_should_not_be_able_to_fetch_car_given_a_list_of_parking_lots_with_parked_car_but_reused_ticket() {
+        ParkingTicket parkingTicket = superSmartParkingBoyWithParkingLotList.park(car);
+        superSmartParkingBoyWithParkingLotList.fetch(parkingTicket);
+        Exception exception = assertThrows(UnrecognizedParkingTicketException.class, () -> superSmartParkingBoyWithParkingLotList.fetch(parkingTicket));
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+
+    @Test
+    public void superSmartParkingBoy_should_not_allow_car_to_park_if_a_list_of_parking_lots_is_full() {
+        ParkingLot spyParkingLot = Mockito.spy(ParkingLot.class);
+        SuperSmartParkingBoy parkingBoyToBeSpied = new SuperSmartParkingBoy(Arrays.asList(spyParkingLot, spyParkingLot, spyParkingLot));
+        SuperSmartParkingBoy mockSuperSmartParkingBoy = Mockito.spy(parkingBoyToBeSpied);
+        Mockito.lenient().when(spyParkingLot.isFull()).thenReturn(true);
+        Exception exception = assertThrows(NoAvailableParkingPositionException.class, () -> mockSuperSmartParkingBoy.park(car));
+        assertEquals("No available position.", exception.getMessage());
+    }
+
+    @Test
+    public void superSmartParkingBoy_should_park_car_at_parking_lot_with_most_slot_rate_given_a_list_of_parking_lots() {
+        ParkingLot firstParkingLot = new ParkingLot();
+        ParkingLot secondParkingLot = new ParkingLot(20);
+        ParkingLot thirdParkingLot = new ParkingLot(100);
+        ParkingLot firstSpyParkingLot = Mockito.spy(firstParkingLot);
+        ParkingLot secondSpyParkingLot = Mockito.spy(secondParkingLot);
+        ParkingLot thirdSpyParkingLot = Mockito.spy(thirdParkingLot);
+        Mockito.lenient().when(firstSpyParkingLot.getRemainingParkingLotSlots()).thenReturn(1);
+        Mockito.lenient().when(secondSpyParkingLot.getRemainingParkingLotSlots()).thenReturn(15);
+        Mockito.lenient().when(thirdSpyParkingLot.getRemainingParkingLotSlots()).thenReturn(50);
+
+        SuperSmartParkingBoy parkingBoyToBeSpied = new SuperSmartParkingBoy(Arrays.asList(firstSpyParkingLot, secondSpyParkingLot, thirdSpyParkingLot));
+        SuperSmartParkingBoy mockSuperSmartParkingBoy = Mockito.spy(parkingBoyToBeSpied);
+        ParkingTicket parkingTicket = mockSuperSmartParkingBoy.park(car);
+        assertNotNull(parkingTicket);
+        assertEquals(mockSuperSmartParkingBoy.getParkingLots().get(1).fetch(parkingTicket), car);
     }
 
 }
