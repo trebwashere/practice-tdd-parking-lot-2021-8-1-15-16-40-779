@@ -27,6 +27,9 @@ public class SmartParkingBoy extends ParkingBoy{
     private Optional<ParkingLot> findParkingLotWithMostSlots() {
         return getParkingLots().stream()
                 .filter(parkingLot -> !parkingLot.isFull())
-                .reduce((firstLot, secondLot) -> firstLot.getRemainingParkingLotSlots() >= secondLot.getRemainingParkingLotSlots() ? firstLot : secondLot);
+                .reduce((firstLot, secondLot) ->
+                        firstLot.getRemainingParkingLotSlots() >= secondLot.getRemainingParkingLotSlots()
+                                ?
+                                firstLot : secondLot);
     }
 }
