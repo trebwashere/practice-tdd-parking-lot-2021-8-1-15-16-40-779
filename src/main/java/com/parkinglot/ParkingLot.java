@@ -39,4 +39,8 @@ public class ParkingLot {
     public boolean isTicketAtCurrentParkingLot(ParkingTicket parkingTicket) {
         return ticketAndCarMap.containsKey(parkingTicket);
     }
+
+    public int getRemainingParkingLotSlots() {
+        return parkingLotSize - ticketAndCarMap.size();
+    }
 }
