@@ -82,7 +82,7 @@ public class ParkingLotTest {
     }
 
     @Test
-    public void parkingBoy_should_return_parking_ticket_given_a_parking_lot_and_a_car() {
+    public void standardParkingBoy_should_return_parking_ticket_given_a_parking_lot_and_a_car() {
         Car car = new Car();
 
         ParkingTicket parkingTicket = standardParkingBoy.park(car);
@@ -90,11 +90,41 @@ public class ParkingLotTest {
     }
 
     @Test
-    public void parkingBoy_should_return_car_when_fetch_given_a_parking_lot_with_parked_car_and_a_parking_ticket() {
+    public void standardParkingBoy_should_return_car_when_fetch_given_a_parking_lot_with_parked_car_and_a_parking_ticket() {
         Car car = new Car();
         ParkingTicket parkingTicket = standardParkingBoy.park(car);
         Car returnedCar = standardParkingBoy.fetch(parkingTicket);
 
         assertEquals(returnedCar, car);
+    }
+
+    @Test
+    public void standardParkingBoy_should_not_fetch_car_given_a_parking_lot_with_parked_car_but_invalid_ticket() {
+        Car car = new Car();
+        standardParkingBoy.park(car);
+        ParkingTicket fakeParkingTicket = new ParkingTicket();
+        Exception exception = assertThrows(UnrecognizedParkingTicketException.class, () -> standardParkingBoy.fetch(fakeParkingTicket));
+
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+
+    @Test
+    public void standardParkingBoy_should_not_be_able_to_fetch_car_given_a_parking_lot_with_parked_car_but_reused_ticket() {
+        Car car = new Car();
+        ParkingTicket parkingTicket = standardParkingBoy.park(car);
+        standardParkingBoy.fetch(parkingTicket);
+        Exception exception = assertThrows(UnrecognizedParkingTicketException.class, () -> standardParkingBoy.fetch(parkingTicket));
+        assertEquals("Unrecognized parking ticket.", exception.getMessage());
+    }
+
+    @Test
+    public void standardParkingBoy_should_not_allow_car_to_park_if_parking_lot_is_full() {
+        Car car = new Car();
+        ParkingLot spyParkingLot = Mockito.spy(ParkingLot.class);
+        StandardParkingBoy parkingBoyToBeSpied = new StandardParkingBoy(spyParkingLot);
+        StandardParkingBoy mockStandardParkingBoy = Mockito.spy(parkingBoyToBeSpied);
+        Mockito.lenient().when(spyParkingLot.getParkingLotSlotSize()).thenReturn(10);
+        Exception exception = assertThrows(NoAvailableParkingPositionException.class, () -> mockStandardParkingBoy.park(car));
+        assertEquals("No available position.", exception.getMessage());
     }
 }
