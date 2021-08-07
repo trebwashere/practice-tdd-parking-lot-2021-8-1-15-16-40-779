@@ -21,25 +21,20 @@ public class ParkingLotManager extends StandardParkingBoy{
     }
 
     public ParkingTicket instructParkingBoyToParkCar(ParkingBoy parkingBoy, Car car) {
-        ParkingBoy parkingBoyToBeInstructed = getParkingBoyInList(parkingBoy);
-        if (parkingBoyToBeInstructed != null) {
-                return parkingBoyToBeInstructed.park(car);
-        }
-        return null;
+        return getParkingBoyFromList(parkingBoy)
+                .park(car);
     }
 
     public Car instructParkingBoyToFetchCar(ParkingBoy parkingBoy, ParkingTicket parkingTicket) {
-        ParkingBoy parkingBoyInList = getParkingBoyInList(parkingBoy);
-        if (parkingBoyInList != null) {
-            return parkingBoyInList.fetch(parkingTicket);
-        }
-        return null;
+        return getParkingBoyFromList(parkingBoy)
+                .fetch(parkingTicket);
     }
 
-    private ParkingBoy getParkingBoyInList(ParkingBoy parkingBoy) {
-        return parkingBoyList.stream()
+    private ParkingBoy getParkingBoyFromList(ParkingBoy parkingBoy) {
+        Optional<ParkingBoy> presentParkingBoy = parkingBoyList.stream()
                 .filter(parkBoy -> parkBoy.equals(parkingBoy))
-                .findAny()
-                .orElse(null);
+                .findAny();
+
+        return presentParkingBoy.orElse(null);
     }
 }
