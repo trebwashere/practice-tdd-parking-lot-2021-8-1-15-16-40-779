@@ -1,21 +1,45 @@
 package com.parkinglot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StandardParkingBoy {
-    private ParkingLot parkingLot;
+
+    private List<ParkingLot> parkingLotList = new ArrayList<>();
 
     public StandardParkingBoy(ParkingLot parkingLot) {
-        this.parkingLot = parkingLot;
+        this.parkingLotList.add(parkingLot);
     }
 
-    public ParkingLot getParkingLot() {
-        return parkingLot;
+    public StandardParkingBoy(List<ParkingLot> parkingLotList) {
+        this.parkingLotList = parkingLotList;
+    }
+
+    public List<ParkingLot> getParkingLots() {
+        return parkingLotList;
     }
 
     public ParkingTicket park(Car car) {
-        return parkingLot.parkCar(car);
+        return findFirstAvailableParkingLot()
+                .parkCar(car);
     }
 
     public Car fetch(ParkingTicket parkingTicket) {
-        return parkingLot.fetch(parkingTicket);
+        return findParkingLotRelatedToTicket(parkingTicket)
+                .fetch(parkingTicket);
+    }
+
+    private ParkingLot findParkingLotRelatedToTicket(ParkingTicket parkingTicket) {
+        return parkingLotList.stream()
+                .filter(parkingLot -> parkingLot.isTicketAtCurrentParkingLot(parkingTicket))
+                .findFirst()
+                .orElseThrow(UnrecognizedParkingTicketException::new);
+    }
+
+    private ParkingLot findFirstAvailableParkingLot() {
+        return parkingLotList.stream()
+                .filter(parkingLot -> !parkingLot.isFull())
+                .findFirst()
+                .orElseThrow(NoAvailableParkingPositionException::new);
     }
 }

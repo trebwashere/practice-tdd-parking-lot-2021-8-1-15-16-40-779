@@ -15,7 +15,7 @@ public class ParkingLot {
     }
 
     public ParkingTicket parkCar(Car car) {
-        if (this.getParkingLotSlotSize() < parkingLotSize) {
+        if (!this.isFull()) {
             ParkingTicket parkingTicket = new ParkingTicket();
             ticketAndCarMap.put(parkingTicket, car);
             return parkingTicket;
@@ -32,7 +32,11 @@ public class ParkingLot {
         return fetchedCar;
     }
 
-    public int getParkingLotSlotSize() {
-        return ticketAndCarMap.size();
+    public boolean isFull() {
+        return parkingLotSize < ticketAndCarMap.size();
+    }
+
+    public boolean isTicketAtCurrentParkingLot(ParkingTicket parkingTicket) {
+        return ticketAndCarMap.containsKey(parkingTicket);
     }
 }
